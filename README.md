@@ -22,6 +22,8 @@ This is filler text for how the code is written.
 ## Credits
 Here are a few resources that helped me get this project knocked out!
 * [FIGfont](http://www.jave.de/figlet/figfont.html)
+* [Izweb Technologies](https://www.youtube.com/watch?v=7gKd0MYsSnE)
+* https://www.youtube.com/watch?v=7gKd0MYsSnE
 
 ## License
 * Link for more information: (https://opensource.org/licenses/MIT)
