@@ -23,7 +23,7 @@ connection.connect((err) => {
   if (err) throw err;
   figletStart();
   runStart();
-
+  
 });
 
 const figletStart = () => {
@@ -53,46 +53,70 @@ const runStart = () => {
       type: 'list',
       message: 'What would you like to do?',
       choices: [
-        'View all employees',
-        'View all employees by Department',
-        'View all employees by Branch',
-        'Add employee',
-        'Remove employee',
-        'Update employee role',
-        'Update employee manager',
-        'Add role',
-        'Remove role'
+        'View all Employees',
+        'View all Employees by Role',
+        'View all Employees by Department',
+        'View all Employees by Manager',
+        'Add Employee',
+        'Remove Employee',
+        'Update Employee Role',
+        'Update Employee Manager',
+        'Add Department',
+        'Remove Department',
+        'View all Roles',
+        'Add Role',
+        'Remove Role',
+        'View Total Utilized Budget of a Department',
+        'Quit'
       ],
     })
     .then((answer) => {
       switch (answer.action) {
-        case 'View all employees':
+        case 'View all Employees':
           employeeSearch();
           break;
-        case 'View all employees by Department':
+        case 'View all Employees by Role':
+          roleSearch();
+          break;
+        case 'View all Employees by Department':
           departmentSearch();
           break;
-        case 'View all employees by Branch':
-          branchSearch();
+        case 'View all Employees by Manager':
+          managerSearch();
           break;
-        case 'Add employee':
+        case 'Add Employee':
           addEmployee();
           break;
-        case 'Remove employee':
+        case 'Remove Employee':
           removeEmployee();
           break;
-        case 'Update employee role':
+        case 'Update Employee Role':
           updateRole();
           break;
-        case 'Update employee manager':
+        case 'Update Employee Manager':
           updateManager();
           break;
-        case 'Add role':
+        case 'Add Department':
+          addDepartment();
+          break;
+        case 'Remove Department':
+          removeDepartment();
+          break;
+        case 'View all Roles':
+          viewAllRoles();
+          break;
+        case 'Add Role':
           addRole();
           break;
-        case 'Remove role':
+        case 'Remove Role':
           removeRole();
           break;
+        case 'View Total Utilized Budget of a Department':
+          departmentBudget();
+          break;
+        default:
+          quit();
+          break
       }
     })
 };
@@ -107,147 +131,316 @@ const employeeSearch = () => {
     })
     .then((answer) => {
       const query = '';
-      connection.query(query, {}, 
+      connection.query(query, {},
         (err, res) => {
 
-      })
+        })
+      runStart();
     })
 }
 
-// View all employees query
+// View all employees by role query
+const roleSearch = () => {
+  inquirer
+    .prompt({
+      name: 'branch',
+      type: 'input',
+      message: ''
+    })
+    .then((answer) => {
+      const query = '';
+      connection.query(query, {},
+        (err, res) => {
+
+        })
+      runStart();
+    })
+}
+
+// View all employees by department query
 const departmentSearch = () => {
   inquirer
-  .prompt({
-    name: 'department',
-    type: 'input',
-    message: ''
-  })
-  .then((answer) => {
-    const query = '';
-    connection.query(query, {}, 
-      (err, res) => {
-
+    .prompt({
+      name: 'department',
+      type: 'list',
+      message: 'Which department would you like to see employees for?',
+      choices: [
+        'Engineering',
+        'Finance',
+        'Legal',
+        'Sales'
+      ]
     })
-  })
+    .then((answer) => {
+      const query = '';
+      connection.query(query, {},
+        (err, res) => {
+
+        })
+      runStart();
+    })
+
 }
 
-// View all employees query
-const branchSearch = () => {
+// View all employees by manager query
+const managerSearch = () => {
   inquirer
-  .prompt({
-    name: 'branch',
-    type: 'input',
-    message: ''
-  })
-  .then((answer) => {
-    const query = '';
-    connection.query(query, {}, 
-      (err, res) => {
-
+    .prompt({
+      name: 'manager',
+      type: 'list',
+      message: 'Which manager would you like to see employees for?',
+      choices: [
+        
+      ]
     })
-  })
+    .then((answer) => {
+      const query = '';
+      connection.query(query, {},
+        (err, res) => {
+
+        })
+      runStart();
+    })
+
 }
 
-// View all employees query
+// add employees query
 const addEmployee = () => {
   inquirer
-  .prompt({
-    name: 'addEmployee',
-    type: 'input',
-    message: ''
-  })
-  .then((answer) => {
-    const query = '';
-    connection.query(query, {}, 
-      (err, res) => {
+    .prompt([
+      {
+        name: 'firstName',
+        type: 'input',
+        message: "What is the employee's first name?"
+      },
+      {
+        name: 'lastName',
+        type: 'input',
+        message: "What is the employee's last name?"
+      },
+      {
+        name: 'role',
+        type: 'list',
+        message: "What is the employee's role?",
+        choices: [
+          'Sales Lead',
+          'Salesperson',
+          'Lead Engineer',
+          'Software Engineer',
+          'Account Manager',
+          'Accountant',
+          'Legal Team Lead',
+        ]
+      },
+      {
+        name: 'role',
+        type: 'list',
+        message: "Who is the employee's manager?",
+        choices: [
+          'Drew Hunter',
+          'Sydney Gidabuday',
+          'Sam Parsons',
+          'Matt Centrowitz',
+          'Grant Fisher',
+          'Lopez Lomong',
+          'Bernard Lagat',
+        ]
+      },
+    ]
+    )
+    .then((answer) => {
+      const query = '';
+      connection.query(query, {},
+        (err, res) => {
 
+        })
+      runStart();
     })
-  })
 }
 
-// View all employees query
+// remove employee query
 const removeEmployee = () => {
   inquirer
-  .prompt({
-    name: 'removeEmployee',
-    type: 'input',
-    message: ''
-  })
-  .then((answer) => {
-    const query = '';
-    connection.query(query, {}, 
-      (err, res) => {
-
+    .prompt({
+      name: 'removeEmployee',
+      type: 'list',
+      message: 'Which employee do you want to remove?',
+      choices: []
     })
-  })
+    .then((answer) => {
+      const query = '';
+      connection.query(query, {},
+        (err, res) => {
+
+        })
+      runStart();
+    })
 }
 
-// View all employees query
+// update role query
 const updateRole = () => {
   inquirer
-  .prompt({
-    name: 'updateRole',
-    type: 'input',
-    message: ''
-  })
-  .then((answer) => {
-    const query = '';
-    connection.query(query, {}, 
-      (err, res) => {
+    .prompt([
+      {
+        name: 'employee',
+        type: 'list',
+        message: "Which employee's role do you want to update?",
+        choices: []
+      },
+      {
+        name: 'role',
+        type: 'list',
+        message: 'Which role do you want to assign the selected employee?',
+        choices: [
+          'Sales Lead',
+          'Salesperson',
+          'Lead Engineer',
+          'Software Engineer',
+          'Account Manager',
+          'Accountant',
+          'Legal Team Lead',
+        ]
+      },
+    ])
+    .then((answer) => {
+      const query = '';
+      connection.query(query, {},
+        (err, res) => {
 
+        })
+      runStart();
     })
-  })
 }
 
-// View all employees query
+// update manager query
 const updateManager = () => {
   inquirer
-  .prompt({
-    name: 'updateManager',
-    type: 'input',
-    message: ''
-  })
-  .then((answer) => {
-    const query = '';
-    connection.query(query, {}, 
-      (err, res) => {
-
+    .prompt({
+      name: 'updateManager',
+      type: 'input',
+      message: ''
     })
-  })
+    .then((answer) => {
+      const query = '';
+      connection.query(query, {},
+        (err, res) => {
+
+        })
+      runStart();
+    })
 }
 
-// View all employees query
+// add department query
+const addDepartment = () => {
+  inquirer
+    .prompt({
+      name: 'updateManager',
+      type: 'input',
+      message: ''
+    })
+    .then((answer) => {
+      const query = '';
+      connection.query(query, {},
+        (err, res) => {
+
+        })
+      runStart();
+    })
+}
+
+// remove department query
+const removeDepartment = () => {
+  inquirer
+    .prompt({
+      name: 'updateManager',
+      type: 'input',
+      message: ''
+    })
+    .then((answer) => {
+      const query = '';
+      connection.query(query, {},
+        (err, res) => {
+
+        })
+      runStart();
+    })
+}
+
+// View all employees roles query
+const viewAllRoles = () => {
+  inquirer
+    .prompt({
+      name: 'viewAllRoles',
+      type: 'input',
+      message: ''
+    })
+    .then((answer) => {
+      const query = '';
+      connection.query(query, {},
+        (err, res) => {
+
+        })
+      runStart();
+    })
+}
+
+// add employee role query
 const addRole = () => {
   inquirer
-  .prompt({
-    name: 'addRole',
-    type: 'input',
-    message: ''
-  })
-  .then((answer) => {
-    const query = '';
-    connection.query(query, {}, 
-      (err, res) => {
-
+    .prompt({
+      name: 'addRole',
+      type: 'input',
+      message: ''
     })
-  })
+    .then((answer) => {
+      const query = '';
+      connection.query(query, {},
+        (err, res) => {
+
+        })
+      runStart();
+    })
 }
 
-// View all employees query
+// remove employee role query
 const removeRole = () => {
   inquirer
-  .prompt({
-    name: 'removeRole',
-    type: 'input',
-    message: ''
-  })
-  .then((answer) => {
-    const query = '';
-    connection.query(query, {}, 
-      (err, res) => {
-
+    .prompt({
+      name: 'removeRole',
+      type: 'input',
+      message: ''
     })
-  })
+    .then((answer) => {
+      const query = '';
+      connection.query(query, {},
+        (err, res) => {
+
+        })
+      runStart();
+    })
+}
+
+// View all employee salary totals query
+const departmentBudget = () => {
+  inquirer
+    .prompt({
+      name: 'budget',
+      type: 'input',
+      message: ''
+    })
+    .then((answer) => {
+      const query = '';
+      connection.query(query, {},
+        (err, res) => {
+
+        })
+      runStart();
+    })
+}
+
+// quit
+const quit = () => {
+  console.log('See you next time!')
 }
 
 
