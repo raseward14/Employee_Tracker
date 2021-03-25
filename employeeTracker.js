@@ -114,7 +114,7 @@ const runStart = () => {
         case 'View Total Utilized Budget of a Department':
           departmentBudget();
           break;
-        default:
+        case 'Quit':
           quit();
           break
       }
