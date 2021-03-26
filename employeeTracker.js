@@ -140,18 +140,26 @@ const viewAllEmployees = async () => {
 
 // View all employees by role query
 const roleSearch = async () => {
-  // object with id and title property
+  // object with id and title property- get from viewAllRoles
   const roles = await viewAllRoles();
   // loop over, pull title properties, store in array 
   // const map1 = array1.map(x => x * 2);
   const roleTitles = roles.map(element => element.title)
+  // destructure selectedRole remove 'selectedRole': 'value' <-keep value
   const { selectedRole } = await inquirer  
     .prompt({
       name: 'selectedRole',
       type: 'list',
       choices: roleTitles
     })
-  console.log(selectedRole);
+  // filter all roles, only return the role with the selectedRole value
+  const chosenRole = await roles.filter(element => element.title === selectedRole);
+  // run query SELECT * employees where role_id is the id of the first element in the chosenRole array returned from filter
+  const query = 'SELECT * FROM employee WHERE ?;';
+  const employee = await mySQLQuery(query, { role_id: chosenRole[0].id });
+  console.log(employee);
+  // pretty print the table
+
 }
 
 // map to pull id off of objects 
