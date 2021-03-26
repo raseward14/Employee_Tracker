@@ -23,7 +23,9 @@ This is filler text for how the code is written.
 Here are a few resources that helped me get this project knocked out!
 * [FIGfont](http://www.jave.de/figlet/figfont.html)
 * [Izweb Technologies](https://www.youtube.com/watch?v=7gKd0MYsSnE)
-* http://www.figlet.org/examples.html
+* [Figlet example](http://www.figlet.org/examples.html)
+* [MDN Array.prototype.filter()](https://www.youtube.com/watch?v=7gKd0MYsSnE)
+* [MySQL 8.0 Reference Guide](https://dev.mysql.com/doc/refman/8.0/en/sorting-rows.html)
 
 ## License
 * Link for more information: (https://opensource.org/licenses/MIT)
