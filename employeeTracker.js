@@ -4,6 +4,8 @@ const inquirer = require('inquirer');
 const chalk = require('chalk');
 // for display banner
 const figlet = require('figlet');
+const util = require('util');
+const { Table } = require('console-table-printer');
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -19,11 +21,13 @@ const connection = mysql.createConnection({
   database: 'employeetracker_db',
 });
 
+const mySQLQuery = util.promisify(connection.query).bind(connection);
+
 connection.connect((err) => {
   if (err) throw err;
   figletStart();
   runStart();
-  
+
 });
 
 const figletStart = () => {
@@ -73,7 +77,7 @@ const runStart = () => {
     .then((answer) => {
       switch (answer.action) {
         case 'View all Employees':
-          employeeSearch();
+          viewAllEmployees();
           break;
         case 'View all Employees by Role':
           roleSearch();
@@ -122,40 +126,35 @@ const runStart = () => {
 };
 
 // View all employees query
-const employeeSearch = () => {
-  inquirer
-    .prompt({
-      name: 'employee',
-      type: 'input',
-      message: ''
-    })
-    .then((answer) => {
-      const query = '';
-      connection.query(query, {},
-        (err, res) => {
-
-        })
-      runStart();
-    })
+const viewAllEmployees = async () => {
+  const query = 'SELECT * FROM employee';
+  const employees = await mySQLQuery(query);
+  console.log(employees);
+  // pretty print the table
+  // https://www.npmjs.com/package/console-table-printer
+  // const p = new Table();
+  // p.addRow({ index: 1, text: 'red wine please', value: 10 },
+  // { color: 'green' });
+  runStart();
 }
 
 // View all employees by role query
-const roleSearch = () => {
-  inquirer
+const roleSearch = async () => {
+  // object with id and title property
+  const roles = await viewAllRoles();
+  // loop over, pull title properties, store in array 
+  // const map1 = array1.map(x => x * 2);
+  const roleTitles = roles.map(element => element.title)
+  const { selectedRole } = await inquirer  
     .prompt({
-      name: 'branch',
-      type: 'input',
-      message: ''
+      name: 'selectedRole',
+      type: 'list',
+      choices: roleTitles
     })
-    .then((answer) => {
-      const query = '';
-      connection.query(query, {},
-        (err, res) => {
-
-        })
-      runStart();
-    })
+  console.log(selectedRole);
 }
+
+// map to pull id off of objects 
 
 // View all employees by department query
 const departmentSearch = () => {
@@ -190,7 +189,7 @@ const managerSearch = () => {
       type: 'list',
       message: 'Which manager would you like to see employees for?',
       choices: [
-        
+
       ]
     })
     .then((answer) => {
@@ -367,21 +366,12 @@ const removeDepartment = () => {
 }
 
 // View all employees roles query
-const viewAllRoles = () => {
-  inquirer
-    .prompt({
-      name: 'viewAllRoles',
-      type: 'input',
-      message: ''
-    })
-    .then((answer) => {
-      const query = '';
-      connection.query(query, {},
-        (err, res) => {
-
-        })
-      runStart();
-    })
+const viewAllRoles = async () => {
+  const query = 'SELECT id, title FROM role;';
+  const roles = await mySQLQuery(query);
+  return roles;
+  // console.log(roles);
+  // runStart();
 }
 
 // add employee role query
