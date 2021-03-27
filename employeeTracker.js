@@ -200,7 +200,7 @@ const departmentSearch = async () => {
 }
 
 // View all employees by manager query
-const managerSearch = () => {
+const managerSearch = async () => {
   inquirer
     .prompt({
       name: 'manager',
@@ -268,7 +268,7 @@ const addEmployee = async () => {
 }
 
 // remove employee query
-const removeEmployee = () => {
+const removeEmployee = async () => {
   inquirer
     .prompt({
       name: 'removeEmployee',
@@ -287,7 +287,7 @@ const removeEmployee = () => {
 }
 
 // update role query
-const updateRole = () => {
+const updateRole = async () => {
   inquirer
     .prompt([
       {
@@ -322,7 +322,7 @@ const updateRole = () => {
 }
 
 // update manager query
-const updateManager = () => {
+const updateManager = async () => {
   inquirer
     .prompt({
       name: 'updateManager',
@@ -340,7 +340,7 @@ const updateManager = () => {
 }
 
 // add department query
-const addDepartment = () => {
+const addDepartment = async () => {
   inquirer
     .prompt({
       name: 'updateManager',
@@ -358,7 +358,7 @@ const addDepartment = () => {
 }
 
 // remove department query
-const removeDepartment = () => {
+const removeDepartment = async () => {
   inquirer
     .prompt({
       name: 'updateManager',
@@ -386,7 +386,7 @@ const viewAllRoles = async () => {
 }
 
 // add employee role query
-const addRole = () => {
+const addRole = async () => {
   inquirer
     .prompt({
       name: 'addRole',
@@ -404,7 +404,7 @@ const addRole = () => {
 }
 
 // remove employee role query
-const removeRole = () => {
+const removeRole = async () => {
   inquirer
     .prompt({
       name: 'removeRole',
@@ -422,7 +422,7 @@ const removeRole = () => {
 }
 
 // View all employee salary totals query
-const departmentBudget = () => {
+const departmentBudget = async () => {
   inquirer
     .prompt({
       name: 'budget',
