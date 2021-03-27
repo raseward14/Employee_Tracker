@@ -146,7 +146,7 @@ const roleSearch = async () => {
   // const map1 = array1.map(x => x * 2);
   const roleTitles = roles.map(element => element.title)
   // destructure selectedRole remove 'selectedRole': 'value' <-keep value
-  const { selectedRole } = await inquirer  
+  const { selectedRole } = await inquirer
     .prompt({
       name: 'selectedRole',
       type: 'list',
@@ -171,7 +171,7 @@ const departmentSearch = async () => {
   // map over to pull title property
   const departmentTitles = department.map(element => element.name)
   // destructure const in inquirer to separate selectedDepartment: from departmentTitles dept titles
-  const { selectedDepartment } = await inquirer  
+  const { selectedDepartment } = await inquirer
     .prompt({
       name: 'selectedDepartment',
       type: 'list',
@@ -179,12 +179,22 @@ const departmentSearch = async () => {
     })
   // filter all departments to return the chosen department
   const chosenDepartment = await department.filter(element => element.name === selectedDepartment)
+  console.log(selectedDepartment);
   console.log(chosenDepartment);
   console.log(chosenDepartment[0].id);
-  // run query SELECT * employees where department_id is the id of the first element in the chosenRole array returned from filter
-  const query = 'SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, employee.manager_id, role.id, role.title, role.department_id FROM employee INNER JOIN role ON (employee.manager_id = role.id) WHERE role.department_id = ?';
-  const employee = await mySQLQuery(query, { role_id: chosenDepartment[0].id });
-  console.log(employee);
+  // we want role.id's (return roles) based on the selected department_id above
+  const roleQuery = 'SELECT * FROM role WHERE ?;';
+  // run query SELECT * roles where department_id is the id of the first element in the chosenDepartment array returned from filter
+  const departmentRoles = await mySQLQuery(roleQuery, { department_id: chosenDepartment[0].id });
+  console.log(departmentRoles);
+  // get role.id's from the included department roles => map
+  // returns a new array with only the id's
+  const roleIDs = departmentRoles.map(element => element.id);
+  console.log(roleIDs);
+  // we want to return employees if role.id is included in the above array
+  const employeeQuery = 'SELECT * FROM employee WHERE role_id ?;';
+  const departmentEmployees = await mySQLQuery(employeeQuery, { role_id: roleIDs })
+  console.log(departmentEmployees);
   // pretty print the table
   // runStart();
 }
@@ -254,7 +264,7 @@ const addEmployee = async () => {
         ]
       },
     ])
-  
+
 }
 
 // remove employee query
