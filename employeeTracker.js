@@ -159,34 +159,34 @@ const roleSearch = async () => {
   const employee = await mySQLQuery(query, { role_id: chosenRole[0].id });
   console.log(employee);
   // pretty print the table
-
+  runStart();
 }
 
-// map to pull id off of objects 
-
 // View all employees by department query
-const departmentSearch = () => {
-  inquirer
+const departmentSearch = async () => {
+  // query to view all departments
+  const departmentQuery = 'SELECT * FROM department;';
+  // store in const
+  const department = await mySQLQuery(departmentQuery);
+  // map over to pull title property
+  const departmentTitles = department.map(element => element.name)
+  // destructure const in inquirer to separate selectedDepartment: from departmentTitles dept titles
+  const { selectedDepartment } = await inquirer  
     .prompt({
-      name: 'department',
+      name: 'selectedDepartment',
       type: 'list',
-      message: 'Which department would you like to see employees for?',
-      choices: [
-        'Engineering',
-        'Finance',
-        'Legal',
-        'Sales'
-      ]
+      choices: departmentTitles
     })
-    .then((answer) => {
-      const query = '';
-      connection.query(query, {},
-        (err, res) => {
-
-        })
-      runStart();
-    })
-
+  // filter all departments to return the chosen department
+  const chosenDepartment = await department.filter(element => element.name === selectedDepartment)
+  console.log(chosenDepartment);
+  console.log(chosenDepartment[0].id);
+  // run query SELECT * employees where department_id is the id of the first element in the chosenRole array returned from filter
+  const query = 'SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, employee.manager_id, role.id, role.title, role.department_id FROM employee INNER JOIN role ON (employee.manager_id = role.id) WHERE role.department_id = ?';
+  const employee = await mySQLQuery(query, { role_id: chosenDepartment[0].id });
+  console.log(employee);
+  // pretty print the table
+  // runStart();
 }
 
 // View all employees by manager query
@@ -212,8 +212,8 @@ const managerSearch = () => {
 }
 
 // add employees query
-const addEmployee = () => {
-  inquirer
+const addEmployee = async () => {
+  const { newEmployee } = await inquirer
     .prompt([
       {
         name: 'firstName',
@@ -240,7 +240,7 @@ const addEmployee = () => {
         ]
       },
       {
-        name: 'role',
+        name: 'manager',
         type: 'list',
         message: "Who is the employee's manager?",
         choices: [
@@ -253,16 +253,8 @@ const addEmployee = () => {
           'Bernard Lagat',
         ]
       },
-    ]
-    )
-    .then((answer) => {
-      const query = '';
-      connection.query(query, {},
-        (err, res) => {
-
-        })
-      runStart();
-    })
+    ])
+  
 }
 
 // remove employee query
@@ -375,11 +367,12 @@ const removeDepartment = () => {
 
 // View all employees roles query
 const viewAllRoles = async () => {
-  const query = 'SELECT id, title FROM role;';
+  const query = 'SELECT * FROM role;';
   const roles = await mySQLQuery(query);
   return roles;
-  // console.log(roles);
-  // runStart();
+  console.log(roles);
+  runStart();
+
 }
 
 // add employee role query
