@@ -65,13 +65,14 @@ const runStart = () => {
         'Add Employee',
         'Remove Employee',
         'Update Employee Role',
-        'Update Employee Manager',
+        // 'Update Employee Manager',
+        'View all Departments',
         'Add Department',
         'Remove Department',
         'View all Roles',
         'Add Role',
         'Remove Role',
-        'View Total Utilized Budget of a Department',
+        // 'View Total Utilized Budget of a Department',
         'Quit'
       ],
     })
@@ -96,10 +97,13 @@ const runStart = () => {
           removeEmployee();
           break;
         case 'Update Employee Role':
-          updateRole();
+          updateEmployeeRole();
           break;
-        case 'Update Employee Manager':
-          updateManager();
+        // case 'Update Employee Manager':
+        //   updateManager();
+        //   break;
+        case 'View all Departments':
+          viewAllDepartments();
           break;
         case 'Add Department':
           addDepartment();
@@ -116,9 +120,9 @@ const runStart = () => {
         case 'Remove Role':
           removeRole();
           break;
-        case 'View Total Utilized Budget of a Department':
-          departmentBudget();
-          break;
+        // case 'View Total Utilized Budget of a Department':
+        //   departmentBudget();
+        //   break;
         case 'Quit':
           quit();
           break
@@ -211,7 +215,6 @@ const managerSearch = async () => {
     })
   // filter through the managers to get the selected manager
   const chosenManager = await managers.filter(manager => manager.title === selectedManager);
-  console.log(chosenManager);
   // run an employee query to return employees with manager_id matching selected manager
   const employeeQuery = 'SELECT * FROM employee WHERE ?;';
   const managerEmployees = await mySQLQuery(employeeQuery, { manager_id: chosenManager[0].id })
@@ -227,7 +230,7 @@ const addEmployee = async () => {
   const roles = await mySQLQuery(roleQuery);
   // map through the role objects array to return an array of role titles for inquirer
   const roleTitles = await roles.map(role => role.title)
-  // run a query to get employee by managers
+  // run a query to get managers
   const managerQuery = 'SELECT * FROM role WHERE role.id = 1 OR role.id = 2 OR role.id = 4 OR role.id = 6 OR role.id = 8;';
   // store in a constant
   const managers = await mySQLQuery(managerQuery);
@@ -270,21 +273,19 @@ const addEmployee = async () => {
   // query to insert first name, last name, role, and manager into employee table
   const addEmployeeQuery = "INSERT INTO employee(first_name,last_name,role_id,manager_id) VALUES(?, ?, ?, ?);";
   // run the query
-  const addRole = await mySQLQuery(addEmployeeQuery, [newEmployee.firstName, newEmployee.lastName, chosenRole[0].id, chosenManager[0].id]);
+  await mySQLQuery(addEmployeeQuery, [newEmployee.firstName, newEmployee.lastName, chosenRole[0].id, chosenManager[0].id]);
   // ask what to do next
   runStart();
 }
 
-// remove employee query
+// remove employee query-- done
 const removeEmployee = async () => {
   // query returning all employees from employee table
   const employeeQuery = 'SELECT * FROM employee;';
   // run query
   const employees = await mySQLQuery(employeeQuery);
   // map through employee objects, return only the employee first and last names for our inquirer
-  const employeeNames = employees.map(employee => [employee.first_name, employee.last_name]);
-  console.log(employeeNames);
-  const names = employeeNames.forEach(name => name.join());
+  const employeeNames = employees.map(employee => [employee.first_name, employee.last_name].join(' '));
   // inquirer asking which employee to delete- use the employee names above
   const selectedEmployee = await inquirer
     .prompt({
@@ -293,106 +294,166 @@ const removeEmployee = async () => {
       choices: employeeNames
     })
   const removedEmployee = selectedEmployee.removedEmployee;
-  // filter the employees to get the removed employee based on id
-  const chosenEmployee = await employees.filter(employee => employee.first_name === removedEmployee)
-  console.log(chosenEmployee);
+  // filter the employees to get the removed employee based on first and last name
+  const chosenEmployee = await employees.filter(employee => 
+    removedEmployee.includes(employee.first_name) && 
+    removedEmployee.includes(employee.last_name)
+    );
   // run the query to remove this employee from the employee table
   const deleteQuery = 'DELETE FROM employee WHERE ?;';
   // run query
-  const removeEmployee = await mySQLQuery(deleteQuery, { id: chosenEmployee[0].id })
+  await mySQLQuery(deleteQuery, { id: chosenEmployee[0].id })
   // ask what to do next
   runStart();
-
 }
 
-// update role query
-const updateRole = async () => {
-  inquirer
+// update employee role query
+const updateEmployeeRole = async () => {
+  // query returning all employees from employee table
+  const employeeQuery = 'SELECT * FROM employee;';
+  // run query
+  const employees = await mySQLQuery(employeeQuery);
+  // map through employee objects, return only the employee first and last names for our inquirer
+  const employeeNames = employees.map(employee => [employee.first_name, employee.last_name].join(' '));
+  // query returning all roles from role table
+  const query = 'SELECT * FROM role;';
+  // run query
+  const roles = await mySQLQuery(query);
+  // map through role objects, return only the object titles for our inquirer
+  const roleTitles = roles.map(role => role.title)
+  // inquirer asking which employee to update- use the employee names above, what is their new role, use the role lists above
+  const selectedEmployee = await inquirer
     .prompt([
       {
-        name: 'employee',
-        type: 'list',
-        message: "Which employee's role do you want to update?",
-        choices: []
-      },
-      {
-        name: 'role',
-        type: 'list',
-        message: 'Which role do you want to assign the selected employee?',
-        choices: [
-          'Sales Lead',
-          'Salesperson',
-          'Lead Engineer',
-          'Software Engineer',
-          'Account Manager',
-          'Accountant',
-          'Legal Team Lead',
-        ]
-      },
-    ])
-    .then((answer) => {
-      const query = '';
-      connection.query(query, {},
-        (err, res) => {
-
-        })
-      runStart();
-    })
+      name: 'updatedEmployee',
+      type: 'list',
+      message: 'Which employee would you like to update?',
+      choices: employeeNames
+    },
+    {
+      name: 'updatedRole',
+      type: 'list',
+      message: 'What is their new role?',
+      choices: roleTitles
+    }
+  ])
+  const updatedEmployee = selectedEmployee.updatedEmployee;
+  // filter the employees to get the updated employee based first and last name
+  const chosenEmployee = await employees.filter(employee => 
+    updatedEmployee.includes(employee.first_name) && 
+    updatedEmployee.includes(employee.last_name)
+    );
+  console.log(chosenEmployee);
+  const updatedRole = selectedEmployee.updatedRole;
+  // filter the roles to get the updated role based on title
+  const chosenRole = await roles.filter(role => role.title === updatedRole)
+  // run the query to update this chosenEmployee in the employee table
+  console.log(chosenRole);
+  const updateQuery = 'UPDATE employee SET ? WHERE ?;';
+  // run query
+  await mySQLQuery(updateQuery, [{ role_id:chosenRole[0].id }, { id: chosenEmployee[0].id }])
+  // ask what to do next
+  runStart();
 }
 
 // update manager query
-const updateManager = async () => {
-  inquirer
-    .prompt({
-      name: 'updateManager',
-      type: 'input',
-      message: ''
-    })
-    .then((answer) => {
-      const query = '';
-      connection.query(query, {},
-        (err, res) => {
+// const updateManager = async () => {
+//     // query to return all employees
+//     const roleQuery = 'SELECT * FROM employee;';
+//     // run the query
+//     const roles = await mySQLQuery(roleQuery);
+//     // map through the role objects array to return an array of role titles for inquirer
+//     const roleTitles = await roles.map(role => role.title)
+  
+//     // run a query to get managers
+//     const managerQuery = 'SELECT * FROM role WHERE role.id = 1 OR role.id = 2 OR role.id = 4 OR role.id = 6 OR role.id = 8;';
+//     // store in a constant
+//     const managers = await mySQLQuery(managerQuery);
+//     // map to retrieve the manager title
+//     const managerTitles = managers.map(manager => manager.title);
+//     // await responses to employee first name, last name, role title, and manager
+//     const newEmployee = await inquirer
+//       .prompt([
+//         {
+//           name: 'firstName',
+//           type: 'input',
+//           message: "What is the employee's first name?"
+//         },
+//         {
+//           name: 'lastName',
+//           type: 'input',
+//           message: "What is the employee's last name?"
+//         },
+//         {
+//           name: 'role',
+//           type: 'list',
+//           message: "What is the employee's role?",
+//           choices: roleTitles
+//         },
+//         {
+//           name: 'manager',
+//           type: 'list',
+//           message: "Who is the employee's manager?",
+//           choices: managerTitles
+//         },
+//       ])
+//     // filter roles to get role object based on newEmployee.role
+//     // object has .id .title .salary .department_id
+//     const chosenRole = await roles.filter(role => role.title === newEmployee.role);
+//     // filter all managers above based on newEmployee.manager
+//     // will return a manager with a .id .title .salary .department_id property
+//     const chosenManager = await managers.filter(manager => manager.title === newEmployee.manager);
+//     console.log(newEmployee);
+//     console.log(chosenRole);
+//     // query to insert first name, last name, role, and manager into employee table
+//     const addEmployeeQuery = "INSERT INTO employee(first_name,last_name,role_id,manager_id) VALUES(?, ?, ?, ?);";
+//     // run the query
+//     const addRole = await mySQLQuery(addEmployeeQuery, [newEmployee.firstName, newEmployee.lastName, chosenRole[0].id, chosenManager[0].id]);
+//     // ask what to do next
+//     runStart();
+// }
 
-        })
-      runStart();
-    })
-}
-
-// add department query
+// add department query-- done
 const addDepartment = async () => {
-  // INSERT INTO table SET ?
-  inquirer
-    .prompt({
-      name: 'updateManager',
-      type: 'input',
-      message: ''
-    })
-    .then((answer) => {
-      const query = '';
-      connection.query(query, {},
-        (err, res) => {
-
-        })
-      runStart();
-    })
+  // await responses to department name
+  const { newDepartment } = await inquirer
+    .prompt(
+      {
+        name: 'newDepartment',
+        type: 'input',
+        message: "What is the new department name?"
+      },
+    )
+  // query to insert department name into department table
+  const addDepartmentQuery = "INSERT INTO department(name) VALUES(?);";
+  // run the query
+  await mySQLQuery(addDepartmentQuery, newDepartment);
+  // ask what to do next
+  runStart();
 }
 
-// remove department query
+// remove department query-- done
 const removeDepartment = async () => {
-  inquirer
-    .prompt({
-      name: 'updateManager',
-      type: 'input',
-      message: ''
-    })
-    .then((answer) => {
-      const query = '';
-      connection.query(query, {},
-        (err, res) => {
-
-        })
-      runStart();
-    })
+    // query returning all departments from department table
+    const query = 'SELECT * FROM department;';
+    // run query
+    const depts = await mySQLQuery(query);
+    // map through department objects, return only the object names for our inquirer
+    const deptTitles = depts.map(role => role.name)
+    // inquirer asking which department to delete- use the department names above
+    const selectedDept = await inquirer
+      .prompt({
+        name: 'removedDepartment',
+        type: 'list',
+        choices: deptTitles
+      })
+    const removedDept = selectedDept.removedDepartment;
+    // run the query to remove this role from the role table
+    const deleteQuery = 'DELETE FROM department WHERE ?;';
+    // run query
+    await mySQLQuery(deleteQuery, { name: removedDept })
+    // ask what to do next
+    runStart();
 }
 
 // View all employees roles query-- done
@@ -402,6 +463,16 @@ const viewAllRoles = async () => {
   // run query
   const roles = await mySQLQuery(query);
   console.table(roles);
+  runStart();
+}
+
+// View all departments-- done
+const viewAllDepartments = async () => {
+  // query returning all departments from departments table
+  const query = 'SELECT * FROM department;';
+  // run query
+  const departments = await mySQLQuery(query);
+  console.table(departments);
   runStart();
 }
 
@@ -438,13 +509,13 @@ const addRole = async () => {
   // query to insert title, salary, and department_id into role talbe
   const addRoleQuery = "INSERT INTO role(title,salary,department_id) VALUES(?, ?, ?);";
   // run the query
-  const addRole = await mySQLQuery(addRoleQuery, [newRole.roleName, newRole.roleSalary, departmentID[0].id]);
+  await mySQLQuery(addRoleQuery, [newRole.roleName, newRole.roleSalary, departmentID[0].id]);
   // ask what to do next
   runStart();
 
 }
 
-// remove employee role query
+// remove employee role query-- done
 const removeRole = async () => {
   // query returning all roles from role table
   const query = 'SELECT * FROM role;';
@@ -464,30 +535,30 @@ const removeRole = async () => {
   // run the query to remove this role from the role table
   const deleteQuery = 'DELETE FROM role WHERE ?;';
   // run query
-  const removeRole = await mySQLQuery(deleteQuery, { title: removedTitle })
+  await mySQLQuery(deleteQuery, { title: removedTitle })
   // ask what to do next
   runStart();
 }
 
 // View all employee salary totals query
-const departmentBudget = async () => {
-  inquirer
-    .prompt({
-      name: 'budget',
-      type: 'input',
-      message: ''
-    })
-    .then((answer) => {
-      const query = '';
-      connection.query(query, {},
-        (err, res) => {
+// const departmentBudget = async () => {
+//   inquirer
+//     .prompt({
+//       name: 'budget',
+//       type: 'input',
+//       message: ''
+//     })
+//     .then((answer) => {
+//       const query = '';
+//       connection.query(query, {},
+//         (err, res) => {
 
-        })
-      runStart();
-    })
-}
+//         })
+//       runStart();
+//     })
+// }
 
-// quit
+// quit-- done
 const quit = () => {
   console.log('See you next time!')
 }
