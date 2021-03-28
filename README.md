@@ -26,6 +26,7 @@ Here are a few resources that helped me get this project knocked out!
 * [Figlet example](http://www.figlet.org/examples.html)
 * [MDN Array.prototype.filter()](https://www.youtube.com/watch?v=7gKd0MYsSnE)
 * [MySQL 8.0 Reference Guide](https://dev.mysql.com/doc/refman/8.0/en/sorting-rows.html)
+* [w3schools includes() method](https://www.w3schools.com/jsref/jsref_includes.asp)
 
 ## License
 * Link for more information: (https://opensource.org/licenses/MIT)
