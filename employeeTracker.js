@@ -6,6 +6,7 @@ const chalk = require('chalk');
 const figlet = require('figlet');
 const util = require('util');
 const { Table } = require('console-table-printer');
+const { join } = require('path');
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -125,23 +126,19 @@ const runStart = () => {
     })
 };
 
-// View all employees query
+// View all employees query-- done
 const viewAllEmployees = async () => {
   const query = 'SELECT * FROM employee';
   const employees = await mySQLQuery(query);
-  console.log(employees);
-  // pretty print the table
-  // https://www.npmjs.com/package/console-table-printer
-  // const p = new Table();
-  // p.addRow({ index: 1, text: 'red wine please', value: 10 },
-  // { color: 'green' });
+  console.table(employees);
   runStart();
 }
 
-// View all employees by role query
+// View all employees by role query-- done
 const roleSearch = async () => {
   // object with id and title property- get from viewAllRoles
-  const roles = await viewAllRoles();
+  const roleQuery = 'SELECT * FROM role;';
+  const roles = await mySQLQuery(roleQuery);
   // loop over, pull title properties, store in array 
   // const map1 = array1.map(x => x * 2);
   const roleTitles = roles.map(element => element.title)
@@ -157,12 +154,11 @@ const roleSearch = async () => {
   // run query SELECT * employees where role_id is the id of the first element in the chosenRole array returned from filter
   const query = 'SELECT * FROM employee WHERE ?;';
   const employee = await mySQLQuery(query, { role_id: chosenRole[0].id });
-  console.log(employee);
-  // pretty print the table
+  console.table(employee);
   runStart();
 }
 
-// View all employees by department query
+// View all employees by department query-- done
 const departmentSearch = async () => {
   // query to view all departments
   const departmentQuery = 'SELECT * FROM department;';
@@ -192,38 +188,53 @@ const departmentSearch = async () => {
   const roleIDs = departmentRoles.map(element => element.id);
   console.log(roleIDs);
   // we want to return employees if role.id is included in the above array
-  const employeeQuery = 'SELECT * FROM employee WHERE role_id ?;';
-  const departmentEmployees = await mySQLQuery(employeeQuery, { role_id: roleIDs })
-  console.log(departmentEmployees);
-  // pretty print the table
-  // runStart();
+  const employeeQuery = 'SELECT * FROM employee WHERE role_id = ? OR role_id = ? OR role_id = ?;';
+  const departmentEmployees = await mySQLQuery(employeeQuery, [roleIDs[0], roleIDs[1], roleIDs[2]])
+  console.table(departmentEmployees);
+  runStart();
 }
 
-// View all employees by manager query
+// View all employees by manager query-- done
 const managerSearch = async () => {
-  inquirer
+  // run a query to get employee by managers
+  const managerQuery = 'SELECT * FROM role WHERE role.id = 1 OR role.id = 2 OR role.id = 4 OR role.id = 6 OR role.id = 8;';
+  // store in a constant
+  const managers = await mySQLQuery(managerQuery);
+  // map to retrieve the manager title
+  const managerTitles = managers.map(manager => manager.title);
+  // deconstruct inquirer prompt to select which manager to view by
+  const { selectedManager } = await inquirer
     .prompt({
-      name: 'manager',
+      name: 'selectedManager',
       type: 'list',
-      message: 'Which manager would you like to see employees for?',
-      choices: [
-
-      ]
+      choices: managerTitles
     })
-    .then((answer) => {
-      const query = '';
-      connection.query(query, {},
-        (err, res) => {
-
-        })
-      runStart();
-    })
-
+  // filter through the managers to get the selected manager
+  const chosenManager = await managers.filter(manager => manager.title === selectedManager);
+  console.log(chosenManager);
+  // run an employee query to return employees with manager_id matching selected manager
+  const employeeQuery = 'SELECT * FROM employee WHERE ?;';
+  const managerEmployees = await mySQLQuery(employeeQuery, { manager_id: chosenManager[0].id })
+  console.table(managerEmployees);
+  runStart();
 }
 
-// add employees query
+// add employees query-- done
 const addEmployee = async () => {
-  const { newEmployee } = await inquirer
+  // query to return all roles
+  const roleQuery = 'SELECT * FROM role;';
+  // run the query
+  const roles = await mySQLQuery(roleQuery);
+  // map through the role objects array to return an array of role titles for inquirer
+  const roleTitles = await roles.map(role => role.title)
+  // run a query to get employee by managers
+  const managerQuery = 'SELECT * FROM role WHERE role.id = 1 OR role.id = 2 OR role.id = 4 OR role.id = 6 OR role.id = 8;';
+  // store in a constant
+  const managers = await mySQLQuery(managerQuery);
+  // map to retrieve the manager title
+  const managerTitles = managers.map(manager => manager.title);
+  // await responses to employee first name, last name, role title, and manager
+  const newEmployee = await inquirer
     .prompt([
       {
         name: 'firstName',
@@ -239,51 +250,59 @@ const addEmployee = async () => {
         name: 'role',
         type: 'list',
         message: "What is the employee's role?",
-        choices: [
-          'Sales Lead',
-          'Salesperson',
-          'Lead Engineer',
-          'Software Engineer',
-          'Account Manager',
-          'Accountant',
-          'Legal Team Lead',
-        ]
+        choices: roleTitles
       },
       {
         name: 'manager',
         type: 'list',
         message: "Who is the employee's manager?",
-        choices: [
-          'Drew Hunter',
-          'Sydney Gidabuday',
-          'Sam Parsons',
-          'Matt Centrowitz',
-          'Grant Fisher',
-          'Lopez Lomong',
-          'Bernard Lagat',
-        ]
+        choices: managerTitles
       },
     ])
-
+  // filter roles to get role object based on newEmployee.role
+  // object has .id .title .salary .department_id
+  const chosenRole = await roles.filter(role => role.title === newEmployee.role);
+  // filter all managers above based on newEmployee.manager
+  // will return a manager with a .id .title .salary .department_id property
+  const chosenManager = await managers.filter(manager => manager.title === newEmployee.manager);
+  console.log(newEmployee);
+  console.log(chosenRole);
+  // query to insert first name, last name, role, and manager into employee table
+  const addEmployeeQuery = "INSERT INTO employee(first_name,last_name,role_id,manager_id) VALUES(?, ?, ?, ?);";
+  // run the query
+  const addRole = await mySQLQuery(addEmployeeQuery, [newEmployee.firstName, newEmployee.lastName, chosenRole[0].id, chosenManager[0].id]);
+  // ask what to do next
+  runStart();
 }
 
 // remove employee query
 const removeEmployee = async () => {
-  inquirer
+  // query returning all employees from employee table
+  const employeeQuery = 'SELECT * FROM employee;';
+  // run query
+  const employees = await mySQLQuery(employeeQuery);
+  // map through employee objects, return only the employee first and last names for our inquirer
+  const employeeNames = employees.map(employee => [employee.first_name, employee.last_name]);
+  console.log(employeeNames);
+  const names = employeeNames.forEach(name => name.join());
+  // inquirer asking which employee to delete- use the employee names above
+  const selectedEmployee = await inquirer
     .prompt({
-      name: 'removeEmployee',
+      name: 'removedEmployee',
       type: 'list',
-      message: 'Which employee do you want to remove?',
-      choices: []
+      choices: employeeNames
     })
-    .then((answer) => {
-      const query = '';
-      connection.query(query, {},
-        (err, res) => {
+  const removedEmployee = selectedEmployee.removedEmployee;
+  // filter the employees to get the removed employee based on id
+  const chosenEmployee = await employees.filter(employee => employee.first_name === removedEmployee)
+  console.log(chosenEmployee);
+  // run the query to remove this employee from the employee table
+  const deleteQuery = 'DELETE FROM employee WHERE ?;';
+  // run query
+  const removeEmployee = await mySQLQuery(deleteQuery, { id: chosenEmployee[0].id })
+  // ask what to do next
+  runStart();
 
-        })
-      runStart();
-    })
 }
 
 // update role query
@@ -341,6 +360,7 @@ const updateManager = async () => {
 
 // add department query
 const addDepartment = async () => {
+  // INSERT INTO table SET ?
   inquirer
     .prompt({
       name: 'updateManager',
@@ -375,50 +395,78 @@ const removeDepartment = async () => {
     })
 }
 
-// View all employees roles query
+// View all employees roles query-- done
 const viewAllRoles = async () => {
+  // query returning all roles from role table
   const query = 'SELECT * FROM role;';
+  // run query
   const roles = await mySQLQuery(query);
-  return roles;
-  console.log(roles);
+  console.table(roles);
+  runStart();
+}
+
+// add employee role query-- done
+const addRole = async () => {
+  // query to return all departments
+  const departmentQuery = 'SELECT * FROM department;';
+  // run the query
+  const departments = await mySQLQuery(departmentQuery);
+  // map through the department objects array to return an array of department titles for inquirer
+  const departmentTitles = await departments.map(department => department.name)
+  // await responses to role name, salary, and department_id
+  const newRole = await inquirer
+    .prompt([
+      {
+        name: 'roleName',
+        type: 'input',
+        message: 'What is the role title?'
+      },
+      {
+        name: 'roleSalary',
+        type: 'input',
+        message: 'What is the role salary?'
+      },
+      {
+        name: 'roleDepartment',
+        type: 'list',
+        message: 'Which department does this role fall under?',
+        choices: departmentTitles
+      },
+    ])
+  // filter departments to get department object based on newRole.roleDepartment
+  const departmentID = await departments.filter(department => department.name === newRole.roleDepartment)
+  // query to insert title, salary, and department_id into role talbe
+  const addRoleQuery = "INSERT INTO role(title,salary,department_id) VALUES(?, ?, ?);";
+  // run the query
+  const addRole = await mySQLQuery(addRoleQuery, [newRole.roleName, newRole.roleSalary, departmentID[0].id]);
+  // ask what to do next
   runStart();
 
 }
 
-// add employee role query
-const addRole = async () => {
-  inquirer
-    .prompt({
-      name: 'addRole',
-      type: 'input',
-      message: ''
-    })
-    .then((answer) => {
-      const query = '';
-      connection.query(query, {},
-        (err, res) => {
-
-        })
-      runStart();
-    })
-}
-
 // remove employee role query
 const removeRole = async () => {
-  inquirer
+  // query returning all roles from role table
+  const query = 'SELECT * FROM role;';
+  // run query
+  const roles = await mySQLQuery(query);
+  // map through role objects, return only the object titles for our inquirer
+  const roleTitles = roles.map(role => role.title)
+  // inquirer asking which role to delete- use the role titles above
+  // destructure to seperate the removedRole key from the selected value
+  const selectedRole = await inquirer
     .prompt({
-      name: 'removeRole',
-      type: 'input',
-      message: ''
+      name: 'removedRole',
+      type: 'list',
+      choices: roleTitles
     })
-    .then((answer) => {
-      const query = '';
-      connection.query(query, {},
-        (err, res) => {
-
-        })
-      runStart();
-    })
+  const removedTitle = selectedRole.removedRole;
+  // run the query to remove this role from the role table
+  const deleteQuery = 'DELETE FROM role WHERE ?;';
+  // run query
+  const removeRole = await mySQLQuery(deleteQuery, { title: removedTitle })
+  // ask what to do next
+  runStart();
 }
 
 // View all employee salary totals query
