@@ -8,6 +8,7 @@ const util = require('util');
 const { Table } = require('console-table-printer');
 const { join } = require('path');
 
+// connection boiler plate
 const connection = mysql.createConnection({
   host: 'localhost',
 
@@ -22,15 +23,17 @@ const connection = mysql.createConnection({
   database: 'employeetracker_db',
 });
 
+// query constant for all queries
 const mySQLQuery = util.promisify(connection.query).bind(connection);
 
+// connection
 connection.connect((err) => {
   if (err) throw err;
   figletStart();
   runStart();
-
 });
 
+// welcome figlet print-- done
 const figletStart = () => {
   console.log(
     chalk.green(
@@ -50,7 +53,7 @@ const figletStart = () => {
   );
 }
 
-
+// switch statement giving options-- done
 const runStart = () => {
   inquirer
     .prompt({
@@ -268,8 +271,6 @@ const addEmployee = async () => {
   // filter all managers above based on newEmployee.manager
   // will return a manager with a .id .title .salary .department_id property
   const chosenManager = await managers.filter(manager => manager.title === newEmployee.manager);
-  console.log(newEmployee);
-  console.log(chosenRole);
   // query to insert first name, last name, role, and manager into employee table
   const addEmployeeQuery = "INSERT INTO employee(first_name,last_name,role_id,manager_id) VALUES(?, ?, ?, ?);";
   // run the query
@@ -307,7 +308,7 @@ const removeEmployee = async () => {
   runStart();
 }
 
-// update employee role query
+// update employee role query-- done
 const updateEmployeeRole = async () => {
   // query returning all employees from employee table
   const employeeQuery = 'SELECT * FROM employee;';
@@ -343,12 +344,10 @@ const updateEmployeeRole = async () => {
     updatedEmployee.includes(employee.first_name) && 
     updatedEmployee.includes(employee.last_name)
     );
-  console.log(chosenEmployee);
   const updatedRole = selectedEmployee.updatedRole;
   // filter the roles to get the updated role based on title
   const chosenRole = await roles.filter(role => role.title === updatedRole)
   // run the query to update this chosenEmployee in the employee table
-  console.log(chosenRole);
   const updateQuery = 'UPDATE employee SET ? WHERE ?;';
   // run query
   await mySQLQuery(updateQuery, [{ role_id:chosenRole[0].id }, { id: chosenEmployee[0].id }])
