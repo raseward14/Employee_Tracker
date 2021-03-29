@@ -35,7 +35,7 @@ CREATE TABLE employee (
   -- Makes a string column called "last_name" which cannot contain null --
   last_name VARCHAR(30) NOT NULL,
   -- Makes an numeric column called "role_id" --
-  role_id INTEGER,
+  role_id INTEGER NOT NULL,
   -- Makes an numeric column called "manager_id" --
   manager_id INTEGER,
   -- Sets id as this table's primary key which means all data contained within it will be unique --

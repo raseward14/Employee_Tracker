@@ -182,18 +182,13 @@ const departmentSearch = async () => {
     })
   // filter all departments to return the chosen department
   const chosenDepartment = await department.filter(element => element.name === selectedDepartment)
-  console.log(selectedDepartment);
-  console.log(chosenDepartment);
-  console.log(chosenDepartment[0].id);
   // we want role.id's (return roles) based on the selected department_id above
   const roleQuery = 'SELECT * FROM role WHERE ?;';
   // run query SELECT * roles where department_id is the id of the first element in the chosenDepartment array returned from filter
   const departmentRoles = await mySQLQuery(roleQuery, { department_id: chosenDepartment[0].id });
-  console.log(departmentRoles);
   // get role.id's from the included department roles => map
   // returns a new array with only the id's
   const roleIDs = departmentRoles.map(element => element.id);
-  console.log(roleIDs);
   // we want to return employees if role.id is included in the above array
   const employeeQuery = 'SELECT * FROM employee WHERE role_id = ? OR role_id = ? OR role_id = ?;';
   const departmentEmployees = await mySQLQuery(employeeQuery, [roleIDs[0], roleIDs[1], roleIDs[2]])

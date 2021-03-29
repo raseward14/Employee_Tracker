@@ -1,0 +1,72 @@
+[
+    {
+        "title": "Manager",
+        "salary": 10000,
+        "department_id": 1
+    },
+    {
+        "title": "Sales Lead",
+        "salary": 8000,
+        "department_id": 4
+    },
+    {
+        "title": "Salesperson",
+        "salary": 6000,
+        "department_id": 4
+    },
+    {
+        "title": "Lead Engineer",
+        "salary": 8000,
+        "department_id": 1
+    },
+    {
+        "title": "Software Engineer",
+        "salary": 6000,
+        "department_id": 1
+    },
+    {
+        "title": "Account Manager",
+        "salary": 8000,
+        "department_id": 2
+    },
+    {
+        "title": "Accountant",
+        "salary": 5000,
+        "department_id": 2
+    },
+    {
+        "title": "Legal Team Lead",
+        "salary": 8000,
+        "department_id": 3
+    },
+    {
+        "title": "Lawyer",
+        "salary": 7000,
+        "department_id": 3
+    },
+    {
+        "title": "Legal Assistant",
+        "salary": 5000,
+        "department_id": 3
+    },
+    {
+        "title": "Sales Intern",
+        "salary": 2000,
+        "department_id": 4
+    },
+    {
+        "title": "Junior Developer",
+        "salary": 2000,
+        "department_id": 1
+    },
+    {
+        "title": "Assistant Manager",
+        "salary": 7000,
+        "department_id": 1
+    },
+    {
+        "title": "Legal Intern",
+        "salary": 2000,
+        "department_id": 3
+    }
+]
