@@ -17,7 +17,7 @@ This is filler text for how the code is written.
 
 ## Usage
 * **The Finished Product**  
-![Team_Profile_Generator](src/images/myteam-sm.png)
+![Employee Tracker](assets/images/snapshot.png)
 
 ## Credits
 Here are a few resources that helped me get this project knocked out!
