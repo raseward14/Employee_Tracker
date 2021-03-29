@@ -4,11 +4,11 @@
 ## Description
 An interface that serves as a Content Management System for managing a company's employees using node, inquirer, and MySQL.
 
-This is filler text outlining what happens in the below video. Click the link below for a video walkthrough.
+This built in command-line application allows the user to add departments, roles, and employees, view departments, roles, and employees, and update employee roles. Click the link below for a video walkthrough.
 
 **[Check out the video here!](https://drive.google.com/file/d/1-Z7d5IIzcBIHGZ7wPe0pSHVjXTYoZc7j/view)**
 
-This is filler text for how the code is written.
+To control the order the code executes, async & await functions are utilized. The user navigates a list inquirer prompt, sending a response into a switch statemtent that calls one of several asynchronous functions below, each of which has at least one SQL query that returns, deletes, or updates data from the database.
 
 ## Table of Contents
 * [Usage](#usage)
