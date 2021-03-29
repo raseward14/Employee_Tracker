@@ -6,7 +6,7 @@ An interface that serves as a Content Management System for managing a company's
 
 This is filler text outlining what happens in the below video. Click the link below for a video walkthrough.
 
-**[Check out the video here!](https://drive.google.com/file/d/1rM6YT2DF8qofT7VaRBkXlUgak32Pdjg3/view)**
+**[Check out the video here!](https://drive.google.com/file/d/1-Z7d5IIzcBIHGZ7wPe0pSHVjXTYoZc7j/view)**
 
 This is filler text for how the code is written.
 
